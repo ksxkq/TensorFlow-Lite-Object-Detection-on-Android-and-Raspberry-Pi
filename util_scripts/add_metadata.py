@@ -1,14 +1,22 @@
 from tflite_support.metadata_writers import object_detector
 from tflite_support.metadata_writers import writer_utils
 from tflite_support import metadata
+import argparse
 
 ObjectDetectorWriter = object_detector.MetadataWriter
-_MODEL_PATH = "mobilenet_v1_0.75_160_quantized.tflite"
-_LABEL_FILE = "labelmap.txt"
-_SAVE_TO_PATH = "mypath_metadata.tflite"
 
-# https://www.tensorflow.org/lite/models/convert/metadata_writer_tutorial#object_detectors
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Generate TFLite object detector metadata")
+parser.add_argument("--model_path", required=True, help="Path to the TFLite model file")
+parser.add_argument("--label_file", required=True, help="Path to the labelmap file")
+parser.add_argument("--save_to_path", required=True, help="Path to save the metadata TFLite file")
+args = parser.parse_args()
 
+_MODEL_PATH = args.model_path
+_LABEL_FILE = args.label_file
+_SAVE_TO_PATH = args.save_to_path
+
+# Create ObjectDetectorWriter and save metadata
 writer = ObjectDetectorWriter.create_for_inference(
     writer_utils.load_file(_MODEL_PATH), [127.5], [127.5], [_LABEL_FILE])
 writer_utils.save_file(writer.populate(), _SAVE_TO_PATH)
